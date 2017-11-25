@@ -1,0 +1,13 @@
+.mylistview .scroll-bar:vertical {
+    -fx-scale-x: 1;
+}
+
+.mylistview  {
+    -fx-padding:5px;
+}
+
+.text-field {
+	-fx-prompt-text-fill: #ecf0f1; 
+    -fx-text-fill: #ecf0f1;
+    /*-fx-highlight-fill: #4eb769; /*Green*/
+}

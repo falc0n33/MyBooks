@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="356.0" style="-fx-background-color: #34495e;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AddBookController">
+   <children>
+      <JFXTextField fx:id="titleField" focusColor="#607d8b" layoutX="85.0" layoutY="14.0" prefHeight="30.0" prefWidth="250.0" promptText="Name" styleClass="text-field" unFocusColor="#616161">
+         <font>
+            <Font size="20.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets top="5.0" />
+         </padding>
+      </JFXTextField>
+      <Label layoutX="19.0" layoutY="17.0" text="Title *" textFill="#ecf0f1">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="19.0" layoutY="72.0" text="Book *" textFill="#ecf0f1">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <JFXButton fx:id="linkButton" layoutX="84.0" layoutY="65.0" onMouseClicked="#getLink" prefHeight="44.0" prefWidth="100.0" style="-fx-background-color: #607D8B;" text="Browse" textFill="#ecf0f1">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </JFXButton>
+      <Label layoutX="20.0" layoutY="131.0" text="Image" textFill="#ecf0f1">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <JFXButton fx:id="imageButton" layoutX="85.0" layoutY="124.0" onMouseClicked="#getImage" prefHeight="44.0" prefWidth="100.0" style="-fx-background-color: #607D8B;" text="Browse" textFill="#ecf0f1">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </JFXButton>
+      <JFXButton fx:id="addButton2" contentDisplay="GRAPHIC_ONLY" layoutX="129.0" layoutY="185.0" onMouseClicked="#addBook" prefHeight="52.0" prefWidth="112.0" ripplerFill="#1976d2" style="-fx-background-color: #64B5F6; -fx-background-radius: 100;">
+         <graphic>
+            <FontAwesomeIconView disable="true" fill="WHITE" glyphName="PLUS" size="35" />
+         </graphic>
+      </JFXButton>
+      <Label layoutX="3.0" layoutY="251.0" text="* Indicates a required fields" textFill="#ecf0f1" />
+   </children>
+</AnchorPane>
