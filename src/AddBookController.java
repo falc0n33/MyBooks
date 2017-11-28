@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 public class AddBookController {
 
@@ -96,6 +97,8 @@ public class AddBookController {
 			
 			contr.refresh(state);
 			
+			Stage stage = (Stage) addButton2.getScene().getWindow();
+			stage.close();			
 		} else {
 			titleField.requestFocus();
 		}

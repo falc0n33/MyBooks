@@ -54,8 +54,7 @@ public class MyBooksController {
 	private JFXTextField searchField;
 	private ContextMenu sortContext;
 	@FXML
-    private FontAwesomeIconView searchIcon;
-
+	private FontAwesomeIconView searchIcon;
 
 	private EventHandler<ActionEvent> action = getAction();
 
@@ -94,14 +93,6 @@ public class MyBooksController {
 			else
 				searchBook(newValue);
 		});
-		/*
-		searchField.focusedProperty().addListener((obs, oldVal, newVal) -> { 
-	    	if (newVal)
-	    		searchIcon.setVisible(false); 
-	    	else
-	    		searchIcon.setVisible(true);
-		});
-		*/
 	}
 
 	void searchBook(String s) {
@@ -191,6 +182,7 @@ public class MyBooksController {
 			// readingList = dao.getAllBooks("reading");
 			booksView.setItems(readingList);
 			state = State.READING;
+			searchField.clear();
 		}
 	}
 
@@ -200,6 +192,7 @@ public class MyBooksController {
 			// laterList = dao.getAllBooks("later");
 			booksView.setItems(laterList);
 			state = State.LATER;
+			searchField.clear();
 		}
 	}
 
@@ -209,6 +202,7 @@ public class MyBooksController {
 			// readList = dao.getAllBooks("read");
 			booksView.setItems(readList);
 			state = State.READ;
+			searchField.clear();
 		}
 	}
 
