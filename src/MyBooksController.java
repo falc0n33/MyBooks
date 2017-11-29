@@ -1,3 +1,5 @@
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 
@@ -18,6 +20,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -27,6 +31,10 @@ public class MyBooksController {
 
 	@FXML
 	private JFXListView<Book> booksView;
+
+	private Desktop desktop = Desktop.getDesktop();
+
+	private Book currentBook;
 
 	private Comparator<Book> ascComp = new Comparator<Book>() {
 		@Override
@@ -43,7 +51,6 @@ public class MyBooksController {
 	};
 
 	private String mode = "ASC";
-
 	private ObservableList<Book> readingList = FXCollections.observableArrayList();
 	private ObservableList<Book> laterList = FXCollections.observableArrayList();
 	private ObservableList<Book> readList = FXCollections.observableArrayList();
@@ -60,6 +67,17 @@ public class MyBooksController {
 
 	@FXML
 	private Label MyBooksLabel;
+
+	@FXML
+	private ImageView imageView;
+	@FXML
+	private JFXBadge star;
+	@FXML
+	private JFXTextArea descriptionArea;
+	@FXML
+	private Label titleLabel;
+	@FXML
+	private FontAwesomeIconView openButton;
 
 	public void initialize() {
 		dao = new BookDao();
@@ -80,8 +98,10 @@ public class MyBooksController {
 		booksView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Book>() {
 			@Override
 			public void changed(ObservableValue<? extends Book> observable, Book oldValue, Book newValue) {
-				if (newValue != null)
-					MyBooksLabel.setText("   " + newValue.getTitle());
+				if (newValue != null) {
+					currentBook = newValue;
+					showBook(newValue);
+				}
 			}
 		});
 
@@ -222,6 +242,57 @@ public class MyBooksController {
 		stage.setHeight(295);
 		stage.setResizable(false);
 		stage.show();
+	}
+
+	@FXML
+	void starClicked(MouseEvent event) {
+		int val = Integer.parseInt(star.getText());
+		if (val == 5) {
+			star.setText("0");
+			currentBook.setRate(0);
+		} else {
+			star.setText(Integer.toString(val + 1));
+			if (currentBook != null)
+				currentBook.setRate(val + 1);
+		}
+	}
+
+	@FXML
+	void mouseOver(MouseEvent event) {
+		imageView.setOpacity(0.3);
+		openButton.setVisible(true);
+		star.setVisible(true);
+	}
+
+	@FXML
+	void mouseOut(MouseEvent event) {
+		imageView.setOpacity(1);
+		openButton.setVisible(false);
+		star.setVisible(false);
+	}
+
+	@FXML
+	void openInOS(MouseEvent event) {
+		try {
+			if (currentBook.getLink().length() > 6)
+				desktop.open(new File(currentBook.getLink().substring(6)));
+		} catch (IOException e) {
+			System.out.println("error");
+		}
+	}
+
+	public void showBook(Book book) {
+		MyBooksLabel.setVisible(false);
+		imageView.setVisible(true);
+		//star.setVisible(true);
+		descriptionArea.setText(book.getLink());
+		titleLabel.setText(book.getTitle());
+		star.setText(Integer.toString(book.getRate()));
+		try {
+			imageView.setImage(new Image(book.getImage()));
+		} catch (IllegalArgumentException e) {
+			imageView.setImage(new Image("images/default.jpg"));
+		}
 	}
 
 }

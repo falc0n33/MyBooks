@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXBadge?>
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MyBooksController">
@@ -72,7 +76,7 @@
       </AnchorPane>
       <AnchorPane layoutX="578.0" prefHeight="800.0" prefWidth="622.0" style="-fx-background-color: #607D8B;">
          <children>
-            <Label fx:id="MyBooksLabel" layoutX="169.0" layoutY="360.0" prefHeight="81.0" prefWidth="285.0" text="   MyBooks" textFill="#ecf0f1">
+            <Label fx:id="MyBooksLabel" alignment="CENTER" layoutX="10.0" layoutY="359.0" prefHeight="81.0" prefWidth="602.0" text="   MyBooks" textFill="#ecf0f1">
                <font>
                   <Font size="55.0" />
                </font>
@@ -80,6 +84,27 @@
                   <MaterialDesignIconView fill="#ecf0f1" glyphName="BOOK" size="55" stroke="BLACK" strokeWidth="0.0" wrappingWidth="12.0" />
                </graphic>
             </Label>
+            <ImageView fx:id="imageView" fitHeight="345.0" fitWidth="261.0" layoutX="195.0" layoutY="14.0" onMouseClicked="#openInOS" onMouseEntered="#mouseOver" onMouseExited="#mouseOut" pickOnBounds="true" preserveRatio="true" visible="false" />
+            <JFXBadge fx:id="star" layoutX="280.0" layoutY="300.0" onMouseClicked="#starClicked" onMouseEntered="#mouseOver" onMouseExited="#mouseOut" position="TOP_RIGHT" styleClass="icons-badge" text="1" visible="false">
+               <control>
+                  <StackPane style="-fx-padding: 12;">
+                     <children>
+                        <FontAwesomeIconView fill="#fff600" glyphName="STAR" size="45" styleClass="icon" />
+                     </children>
+                  </StackPane>
+               </control>
+            </JFXBadge>
+            <JFXTextArea fx:id="descriptionArea" focusColor="#ecf0f1" labelFloat="true" layoutX="11.0" layoutY="440.0" prefHeight="214.0" prefWidth="593.0" styleClass="text-area" unFocusColor="#2c3e50">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </JFXTextArea>
+            <Label fx:id="titleLabel" alignment="CENTER" layoutX="10.0" layoutY="360.0" prefHeight="81.0" prefWidth="602.0" textFill="#ecf0f1">
+               <font>
+                  <Font size="35.0" />
+               </font>
+            </Label>
+            <FontAwesomeIconView fx:id="openButton" disable="true" fill="#ecf0f1" glyphName="FILE_ALT" layoutX="294.0" layoutY="216.0" size="45" visible="false" />
          </children></AnchorPane>
    </children>
 </AnchorPane>
