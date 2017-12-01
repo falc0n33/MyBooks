@@ -94,17 +94,18 @@
                   </StackPane>
                </control>
             </JFXBadge>
-            <JFXTextArea fx:id="descriptionArea" focusColor="#ecf0f1" labelFloat="true" layoutX="11.0" layoutY="440.0" prefHeight="214.0" prefWidth="593.0" styleClass="text-area" unFocusColor="#2c3e50">
+            <JFXTextArea fx:id="descriptionArea" focusColor="#ecf0f1" labelFloat="true" layoutX="11.0" layoutY="440.0" prefHeight="214.0" prefWidth="593.0" styleClass="text-area" unFocusColor="#2c3e50" visible="false">
                <font>
                   <Font size="25.0" />
                </font>
             </JFXTextArea>
-            <Label fx:id="titleLabel" alignment="CENTER" layoutX="10.0" layoutY="360.0" prefHeight="81.0" prefWidth="602.0" textFill="#ecf0f1">
+            <Label fx:id="titleLabel" alignment="CENTER" layoutX="10.0" layoutY="360.0" prefHeight="81.0" prefWidth="602.0" textFill="#ecf0f1" visible="false">
                <font>
                   <Font size="35.0" />
                </font>
             </Label>
             <FontAwesomeIconView fx:id="openButton" disable="true" fill="#ecf0f1" glyphName="FILE_ALT" layoutX="294.0" layoutY="216.0" size="45" visible="false" />
+            <FontAwesomeIconView fx:id="deleteIcon" glyphName="TRASH_ALT" layoutX="571.0" layoutY="47.0" onMouseClicked="#deleteClicked" size="45" visible="false" />
          </children></AnchorPane>
    </children>
 </AnchorPane>

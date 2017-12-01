@@ -70,4 +70,14 @@ public class BookDao {
         }
     }
 
+
+    public void delete(Book book, String from) {
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("delete from " + from + " where title = '" + book.getTitle() + "'");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

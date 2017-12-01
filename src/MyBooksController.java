@@ -78,6 +78,8 @@ public class MyBooksController {
 	private Label titleLabel;
 	@FXML
 	private FontAwesomeIconView openButton;
+	@FXML
+	private FontAwesomeIconView deleteIcon;
 
 	public void initialize() {
 		dao = new BookDao();
@@ -203,6 +205,7 @@ public class MyBooksController {
 			booksView.setItems(readingList);
 			state = State.READING;
 			searchField.clear();
+			hideBook();
 		}
 	}
 
@@ -213,6 +216,7 @@ public class MyBooksController {
 			booksView.setItems(laterList);
 			state = State.LATER;
 			searchField.clear();
+			hideBook();
 		}
 	}
 
@@ -223,6 +227,7 @@ public class MyBooksController {
 			booksView.setItems(readList);
 			state = State.READ;
 			searchField.clear();
+			hideBook();
 		}
 	}
 
@@ -258,6 +263,13 @@ public class MyBooksController {
 	}
 
 	@FXML
+	void deleteClicked(MouseEvent event) {
+		deleteBook(currentBook);
+		hideBook();
+		refresh(state);
+	}
+	
+	@FXML
 	void mouseOver(MouseEvent event) {
 		imageView.setOpacity(0.3);
 		openButton.setVisible(true);
@@ -274,8 +286,11 @@ public class MyBooksController {
 	@FXML
 	void openInOS(MouseEvent event) {
 		try {
-			if (currentBook.getLink().length() > 6)
-				desktop.open(new File(currentBook.getLink().substring(6)));
+			if (currentBook.getLink().length() > 6) {
+				File file = new File(currentBook.getLink().substring(6));
+				if (file.exists())
+					desktop.open(file);
+			}
 		} catch (IOException e) {
 			System.out.println("error");
 		}
@@ -284,7 +299,10 @@ public class MyBooksController {
 	public void showBook(Book book) {
 		MyBooksLabel.setVisible(false);
 		imageView.setVisible(true);
-		//star.setVisible(true);
+		// star.setVisible(true);
+		deleteIcon.setVisible(true);
+		descriptionArea.setVisible(true);
+		titleLabel.setVisible(true);
 		descriptionArea.setText(book.getLink());
 		titleLabel.setText(book.getTitle());
 		star.setText(Integer.toString(book.getRate()));
@@ -292,6 +310,32 @@ public class MyBooksController {
 			imageView.setImage(new Image(book.getImage()));
 		} catch (IllegalArgumentException e) {
 			imageView.setImage(new Image("images/default.jpg"));
+		}
+	}
+
+
+	public void hideBook() {
+		MyBooksLabel.setVisible(true);
+		imageView.setVisible(false);
+		deleteIcon.setVisible(false);
+		descriptionArea.setVisible(false);
+		titleLabel.setVisible(false);
+	}
+
+	
+	public void deleteBook(Book book) {
+		if (book != null) {
+			switch (state) {
+			case READING:
+				dao.delete(book, "reading");
+				break;
+			case LATER:
+				dao.delete(book, "later");
+				break;
+			case READ:
+				dao.delete(book, "read");
+				break;
+			}
 		}
 	}
 
