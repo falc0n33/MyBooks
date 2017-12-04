@@ -53,7 +53,7 @@ public class BookDao {
 
         return books;
     }
-    
+    /*
     public void move(Book book, String from, String to) {
         try {
             Statement statement = connection.createStatement();
@@ -68,6 +68,11 @@ public class BookDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }*/
+    
+    public void move(Book book, String from, String to) {
+    	delete(book, from);
+    	addBook(book, to);
     }
 
 
