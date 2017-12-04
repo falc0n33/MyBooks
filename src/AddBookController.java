@@ -81,7 +81,6 @@ public class AddBookController {
 			
 			BookDao dao = new BookDao();
 			State state = contr.getState();
-			System.out.println(state);
 			
 			switch (state) {
 			case READING:

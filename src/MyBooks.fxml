@@ -104,7 +104,7 @@
                   <Font size="35.0" />
                </font>
             </Label>
-            <FontAwesomeIconView fx:id="openButton" disable="true" fill="#ecf0f1" glyphName="FILE_ALT" layoutX="294.0" layoutY="216.0" size="45" visible="false" />
+            <FontAwesomeIconView fx:id="openButton" disable="true" fill="#ecf0f1" glyphName="LEANPUB" layoutX="288.0" layoutY="216.0" size="45" visible="false" />
             <FontAwesomeIconView fx:id="deleteIcon" glyphName="TRASH_ALT" layoutX="571.0" layoutY="47.0" onMouseClicked="#deleteClicked" size="45" visible="false" />
          </children></AnchorPane>
    </children>

@@ -5,6 +5,7 @@ import java.util.Comparator;
 
 import com.jfoenix.controls.*;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -36,21 +37,40 @@ public class MyBooksController {
 
 	private Book currentBook;
 
-	private Comparator<Book> ascComp = new Comparator<Book>() {
+	private Comparator<Book> ascTitleComp = new Comparator<Book>() {
 		@Override
 		public int compare(Book arg0, Book arg1) {
 			return arg0.compareTo(arg1);
 		}
 	};
 
-	private Comparator<Book> descComp = new Comparator<Book>() {
+	private Comparator<Book> descTitleComp = new Comparator<Book>() {
 		@Override
 		public int compare(Book arg0, Book arg1) {
 			return arg1.compareTo(arg0);
 		}
 	};
 
-	private String mode = "ASC";
+	private Comparator<Book> ascRateComp = new Comparator<Book>() {
+		@Override
+		public int compare(Book arg0, Book arg1) {
+			Integer r0 = arg0.getRate();
+			Integer r1 = arg1.getRate();
+			return r0.compareTo(r1);
+		}
+	};
+
+	private Comparator<Book> descRateComp = new Comparator<Book>() {
+		@Override
+		public int compare(Book arg0, Book arg1) {
+			Integer r0 = arg0.getRate();
+			Integer r1 = arg1.getRate();
+			return r1.compareTo(r0);
+		}
+	};
+
+	private String mode = "ascTitle";
+	
 	private ObservableList<Book> readingList = FXCollections.observableArrayList();
 	private ObservableList<Book> laterList = FXCollections.observableArrayList();
 	private ObservableList<Book> readList = FXCollections.observableArrayList();
@@ -145,11 +165,27 @@ public class MyBooksController {
 
 	private void initContextMenu() {
 		sortContext = new ContextMenu();
-		MenuItem m1 = new MenuItem("ASC");
+		MenuItem m1 = new MenuItem();
+		m1.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SORT_ALPHA_ASC));
+		m1.setId("ascTitle");
 		m1.setOnAction(action);
-		MenuItem m2 = new MenuItem("DESC");
+
+		MenuItem m2 = new MenuItem();
+		m2.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SORT_ALPHA_DESC));
+		m2.setId("descTitle");
 		m2.setOnAction(action);
-		sortContext.getItems().setAll(m1, m2);
+
+		MenuItem m3 = new MenuItem();
+		m3.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SORT_NUMERIC_ASC));
+		m3.setId("ascRate");
+		m3.setOnAction(action);
+
+		MenuItem m4 = new MenuItem();
+		m4.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SORT_NUMERIC_DESC));
+		m4.setId("descRate");
+		m4.setOnAction(action);
+
+		sortContext.getItems().setAll(m1, m2, m3, m4);
 	}
 
 	@FXML
@@ -160,24 +196,31 @@ public class MyBooksController {
 
 	private EventHandler<ActionEvent> getAction() {
 		return new EventHandler<ActionEvent>() {
-
 			public void handle(ActionEvent event) {
-				MenuItem mItem = (MenuItem) event.getSource();
-				String button = mItem.getText();
-				if ("ASC".equals(button)) {
-					mode = "ASC";
-					sort();
-				}
-				if ("DESC".equals(button)) {
-					mode = "DESC";
-					sort();
-				}
+				MenuItem m = (MenuItem) event.getSource();
+				System.out.println(m.getId());
+				mode = m.getId();
+				sort();
 			}
 		};
 	}
 
 	private void sort() {
-		Comparator<Book> comp = mode.equals("ASC") ? ascComp : descComp;
+		Comparator<Book> comp = ascTitleComp;
+		switch (mode) {
+		case "ascTitle":
+			comp = ascTitleComp;
+			break;
+		case "descTitle":
+			comp = descTitleComp;
+			break;
+		case "ascRate":
+			comp = ascRateComp;
+			break;
+		case "descRate":
+			comp = descRateComp;
+			break;
+		}
 		booksView.getItems().sort(comp);
 	}
 
@@ -268,7 +311,7 @@ public class MyBooksController {
 		hideBook();
 		refresh(state);
 	}
-	
+
 	@FXML
 	void mouseOver(MouseEvent event) {
 		imageView.setOpacity(0.3);
@@ -313,7 +356,6 @@ public class MyBooksController {
 		}
 	}
 
-
 	public void hideBook() {
 		MyBooksLabel.setVisible(true);
 		imageView.setVisible(false);
@@ -322,7 +364,6 @@ public class MyBooksController {
 		titleLabel.setVisible(false);
 	}
 
-	
 	public void deleteBook(Book book) {
 		if (book != null) {
 			switch (state) {
