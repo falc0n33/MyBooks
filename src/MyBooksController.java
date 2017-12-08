@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +8,7 @@ import com.jfoenix.controls.*;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -70,12 +72,21 @@ public class MyBooksController {
 	};
 
 	private String mode = "ascTitle";
-	
+
 	private ObservableList<Book> readingList = FXCollections.observableArrayList();
 	private ObservableList<Book> laterList = FXCollections.observableArrayList();
 	private ObservableList<Book> readList = FXCollections.observableArrayList();
 	private BookDao dao;
 	private static State state = State.READING;
+
+	@FXML
+	private JFXButton readingButton;
+
+	@FXML
+	private JFXButton laterButton;
+
+	@FXML
+	private JFXButton readButton;
 
 	@FXML
 	private JFXTextField searchField;
@@ -93,13 +104,24 @@ public class MyBooksController {
 	@FXML
 	private JFXBadge star;
 	@FXML
-	private JFXTextArea descriptionArea;
+	private JFXTextArea commentArea;
 	@FXML
 	private Label titleLabel;
 	@FXML
 	private FontAwesomeIconView openButton;
+
 	@FXML
 	private FontAwesomeIconView deleteIcon;
+
+	@FXML
+	private MaterialDesignIconView moveIcon;
+
+	private boolean isMoving;
+
+	private boolean isPressed;
+
+	@FXML
+	private JFXButton saveButton;
 
 	public void initialize() {
 		dao = new BookDao();
@@ -198,7 +220,6 @@ public class MyBooksController {
 		return new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				MenuItem m = (MenuItem) event.getSource();
-				System.out.println(m.getId());
 				mode = m.getId();
 				sort();
 			}
@@ -244,7 +265,14 @@ public class MyBooksController {
 	@FXML
 	private void readingClick(MouseEvent event) {
 		if (booksView.getItems() != readingList) {
-			// readingList = dao.getAllBooks("reading");
+			if (isMoving && currentBook != null) {
+				hideMoving();
+				if (dao.move(currentBook, state.toString().toLowerCase(), "reading")) {
+					// readingList.add(currentBook);
+					refresh(state);
+					refresh(State.READING);
+				}
+			}
 			booksView.setItems(readingList);
 			state = State.READING;
 			searchField.clear();
@@ -255,7 +283,14 @@ public class MyBooksController {
 	@FXML
 	private void laterClick(MouseEvent event) {
 		if (booksView.getItems() != laterList) {
-			// laterList = dao.getAllBooks("later");
+			if (isMoving && currentBook != null) {
+				hideMoving();
+				if (dao.move(currentBook, state.toString().toLowerCase(), "later")) {
+					// laterList.add(currentBook);
+					refresh(state);
+					refresh(State.LATER);
+				}
+			}
 			booksView.setItems(laterList);
 			state = State.LATER;
 			searchField.clear();
@@ -266,7 +301,14 @@ public class MyBooksController {
 	@FXML
 	private void readClick(MouseEvent event) {
 		if (booksView.getItems() != readList) {
-			// readList = dao.getAllBooks("read");
+			if (isMoving && currentBook != null) {
+				hideMoving();
+				if (dao.move(currentBook, state.toString().toLowerCase(), "read")) {
+					// readList.add(currentBook);
+					refresh(state);
+					refresh(State.READ);
+				}
+			}
 			booksView.setItems(readList);
 			state = State.READ;
 			searchField.clear();
@@ -297,11 +339,8 @@ public class MyBooksController {
 		int val = Integer.parseInt(star.getText());
 		if (val == 5) {
 			star.setText("0");
-			currentBook.setRate(0);
 		} else {
 			star.setText(Integer.toString(val + 1));
-			if (currentBook != null)
-				currentBook.setRate(val + 1);
 		}
 	}
 
@@ -342,13 +381,14 @@ public class MyBooksController {
 	public void showBook(Book book) {
 		MyBooksLabel.setVisible(false);
 		imageView.setVisible(true);
-		// star.setVisible(true);
 		deleteIcon.setVisible(true);
-		descriptionArea.setVisible(true);
+		moveIcon.setVisible(true);
+		commentArea.setVisible(true);
 		titleLabel.setVisible(true);
-		descriptionArea.setText(book.getLink());
+		commentArea.setText(book.getComment());
 		titleLabel.setText(book.getTitle());
 		star.setText(Integer.toString(book.getRate()));
+		saveButton.setVisible(true);
 		try {
 			imageView.setImage(new Image(book.getImage()));
 		} catch (IllegalArgumentException e) {
@@ -360,24 +400,90 @@ public class MyBooksController {
 		MyBooksLabel.setVisible(true);
 		imageView.setVisible(false);
 		deleteIcon.setVisible(false);
-		descriptionArea.setVisible(false);
+		moveIcon.setVisible(false);
+		commentArea.setVisible(false);
 		titleLabel.setVisible(false);
+		saveButton.setVisible(false);
 	}
 
 	public void deleteBook(Book book) {
 		if (book != null) {
-			switch (state) {
-			case READING:
-				dao.delete(book, "reading");
-				break;
-			case LATER:
-				dao.delete(book, "later");
-				break;
-			case READ:
-				dao.delete(book, "read");
-				break;
+			dao.delete(book, state.toString().toLowerCase());
+		}
+	}
+
+	@FXML
+	void deleteOut(MouseEvent event) {
+		deleteIcon.setStyle("-fx-fill: #bdc3c7");
+	}
+
+	@FXML
+	void deleteOver(MouseEvent event) {
+		deleteIcon.setStyle("-fx-fill: #e74c3c");
+	}
+
+	@FXML
+	void updateBook(MouseEvent event) {
+		if (currentBook != null) {
+			String actualComment = commentArea.getText();
+			int actualRate = Integer.parseInt(star.getText());
+			if (!actualComment.equals(currentBook.getComment()) || actualRate != currentBook.getRate()) {
+				currentBook.setComment(actualComment);
+				currentBook.setRate(actualRate);
+				dao.update(currentBook, state.toString().toLowerCase());
 			}
 		}
+	}
+
+	@FXML
+	void moveBook(MouseEvent event) {
+		if (!isPressed)
+			showMoving();
+		else
+			hideMoving();
+	}
+
+	private void showMoving() {
+		isMoving = true;
+		isPressed = true;
+		if (state == State.READING) {
+			laterButton.getStyleClass().removeAll("buttonMovingDisable");
+			laterButton.getStyleClass().add("buttonMovingEnable");
+			readButton.getStyleClass().removeAll("buttonMovingDisable");
+			readButton.getStyleClass().add("buttonMovingEnable");
+		} else if (state == State.LATER) {
+			readingButton.getStyleClass().removeAll("buttonMovingDisable");
+			readingButton.getStyleClass().add("buttonMovingEnable");
+			readButton.getStyleClass().removeAll("buttonMovingDisable");
+			readButton.getStyleClass().add("buttonMovingEnable");
+		} else if (state == State.READ) {
+			readingButton.getStyleClass().removeAll("buttonMovingDisable");
+			readingButton.getStyleClass().add("buttonMovingEnable");
+			laterButton.getStyleClass().removeAll("buttonMovingDisable");
+			laterButton.getStyleClass().add("buttonMovingEnable");
+		}
+
+	}
+
+	private void hideMoving() {
+		isMoving = false;
+		isPressed = false;
+		readingButton.getStyleClass().removeAll("buttonMovingEnable");
+		readingButton.getStyleClass().add("buttonMovingDisable");
+		laterButton.getStyleClass().removeAll("buttonMovingEnable");
+		laterButton.getStyleClass().add("buttonMovingDisable");
+		readButton.getStyleClass().removeAll("buttonMovingEnable");
+		readButton.getStyleClass().add("buttonMovingDisable");
+	}
+
+	@FXML
+	void moveOut(MouseEvent event) {
+		moveIcon.setStyle("-fx-fill: #bdc3c7");
+	}
+
+	@FXML
+	void moveOver(MouseEvent event) {
+		moveIcon.setStyle("-fx-fill: #2196F3");
 	}
 
 }

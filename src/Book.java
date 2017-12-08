@@ -4,16 +4,18 @@ public class Book implements Comparable<Book>{
     private String link;
     private String image;
     private int rate;
+    private String comment;
     
     public Book() {
     	
     }
     
-    public Book(String title, String link, String image, int rate){
+    public Book(String title, String link, String image, int rate, String comment){
         this.setTitle(title);
         this.setLink(link);
         this.setImage(image);
         this.setRate(rate);
+        this.setComment(comment);
     }
 
     public String getTitle() {
@@ -46,6 +48,14 @@ public class Book implements Comparable<Book>{
     
     public void setRate(int rate) {
     	this.rate = rate;
+    }
+    
+    public String getComment() {
+    	return comment;
+    }
+    
+    public void setComment(String comment) {
+    	this.comment = comment;
     }
 
 	@Override

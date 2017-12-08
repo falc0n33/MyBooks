@@ -11,18 +11,38 @@ public class BookDao {
         connection = DbUtil.getConnection();
     }
 
-    public void addBook(Book book, String category) {
+    public boolean addBook(Book book, String category) {
         try {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("insert into " + category + "(title,link,image,rate) values (?, ?, ?, ?)");
+                    .prepareStatement("insert into " + category + "(title,link,image,rate,comment) values (?, ?, ?, ?,?)");
             preparedStatement.setString(1, book.getTitle());
             preparedStatement.setString(2, book.getLink());
             preparedStatement.setString(3, book.getImage());
             preparedStatement.setInt(4, book.getRate());
+            preparedStatement.setString(5, book.getComment());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
+    }
+    
+    public boolean update(Book book, String category) {
+    	try {
+    		PreparedStatement preparedStatement = connection
+                    .prepareStatement("update " + category + " set title = ?, image = ?, rate = ?, comment = ? where link = ?");
+            preparedStatement.setString(1, book.getTitle());
+            preparedStatement.setString(2, book.getImage());
+            preparedStatement.setInt(3, book.getRate());
+            preparedStatement.setString(4, book.getComment());
+            preparedStatement.setString(5, book.getLink());
+            preparedStatement.executeUpdate();
+            return true;
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    		return false;
+    	}
     }
 
     public void clear(String category) {
@@ -45,6 +65,7 @@ public class BookDao {
                 b.setLink(rs.getString(3));
                 b.setImage(rs.getString(4));
                 b.setRate(rs.getInt(5));
+                b.setComment(rs.getString(6));
                 books.add(b);
             }
         } catch (SQLException e) {
@@ -53,35 +74,24 @@ public class BookDao {
 
         return books;
     }
-    /*
-    public void move(Book book, String from, String to) {
-        try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate("delete from " + from + " where title = '" + book.getTitle() + "'");
-        	PreparedStatement preparedStatement = connection
-                    .prepareStatement("insert into " + to + "(title,link,image,rate) values (?, ?, ?, ?)");
-            preparedStatement.setString(1, book.getTitle());
-            preparedStatement.setString(2, book.getLink());
-            preparedStatement.setString(3, book.getImage());
-            preparedStatement.setInt(4, book.getRate());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }*/
     
-    public void move(Book book, String from, String to) {
-    	delete(book, from);
-    	addBook(book, to);
+    public boolean move(Book book, String from, String to) {
+    	if (addBook(book, to)) {
+    		delete(book, from);
+    		return true;
+    	}
+    	return false;
     }
 
 
-    public void delete(Book book, String from) {
+    public boolean delete(Book book, String from) {
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate("delete from " + from + " where title = '" + book.getTitle() + "'");
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 

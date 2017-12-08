@@ -1,40 +1,50 @@
 .mylistview .scroll-bar:vertical {
-    -fx-scale-x: 1;
+	-fx-scale-x: 1;
 }
 
-.mylistview  {
-    -fx-padding:5px;
+.mylistview {
+	-fx-padding: 5px;
 }
 
 .text-field {
-	-fx-prompt-text-fill: #ecf0f1; 
-    -fx-text-fill: #ecf0f1;
-    /*-fx-highlight-fill: #4eb769; /*Green*/
+	-fx-prompt-text-fill: #ecf0f1;
+	-fx-text-fill: #ecf0f1;
+	/*-fx-highlight-fill: #4eb769; /*Green*/
+}
+
+.buttonMovingEnable {
+	-fx-background-color: #2196F3;
+	-fx-text-alignment: center;
+}
+
+.buttonMovingDisable {
+	-fx-background-color: #34495e;
+	-fx-text-alignment: center;
 }
 
 .icons-badge .badge-pane {
-    -fx-background-color: #3498db;
-    -fx-background-radius: 25;
-    -fx-pref-width: 25;
-    -fx-pref-height: 25;
-    -fx-alignment: center;
+	-fx-background-color: #3498db;
+	-fx-background-radius: 25;
+	-fx-pref-width: 25;
+	-fx-pref-height: 25;
+	-fx-alignment: center;
 }
 
 .icons-badge Label {
-    -fx-font-weight: BOLD;
-    -fx-font-size: 14.0px;
-    -fx-text-fill: WHITE;
+	-fx-font-weight: BOLD;
+	-fx-font-size: 14.0px;
+	-fx-text-fill: WHITE;
 }
 
 .text-area {
-    -fx-text-fill: #ecf0f1;
-    -fx-display-caret:true;
+	-fx-text-fill: #ecf0f1;
+	-fx-display-caret: true;
 }
 
 .text-area .content {
-    
+	-fx-cursor: DEFAULT;
 }
 
-.text-area .scroll-pane .scroll-bar:vertical { 
-	 -fx-scale-x: 0.5;
+.text-area .scroll-pane .scroll-bar:vertical {
+	-fx-scale-x: 0.5;
 }

@@ -17,8 +17,6 @@ public class AddBookController {
 	private String link;
 	private String image;
 
-	//private Desktop desktop = Desktop.getDesktop();
-
 	@FXML
 	private JFXTextField titleField;
 
@@ -84,13 +82,13 @@ public class AddBookController {
 			
 			switch (state) {
 			case READING:
-				dao.addBook(new Book(title, link, image, 0), "reading");
+				dao.addBook(new Book(title, link, image, 0, "..."), "reading");
 				break;
 			case LATER:
-				dao.addBook(new Book(title, link, image, 0), "later");
+				dao.addBook(new Book(title, link, image, 0, "..."), "later");
 				break;
 			case READ:
-				dao.addBook(new Book(title, link, image, 0), "read");
+				dao.addBook(new Book(title, link, image, 0, "..."), "read");
 				break;
 			}
 			
