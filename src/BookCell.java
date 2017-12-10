@@ -43,8 +43,7 @@ public class BookCell extends JFXListCell<Book> {
 				if (file.exists()) {
 					Image image = new Image(item.getImage());
 					thumbImage.setImage(image);
-				}
-				else
+				} else
 					thumbImage.setImage(new Image("images/default.jpg"));
 			} catch (Exception e) {
 				thumbImage.setImage(new Image("images/default.jpg"));
@@ -56,5 +55,5 @@ public class BookCell extends JFXListCell<Book> {
 		}
 
 	}
-	
+
 }

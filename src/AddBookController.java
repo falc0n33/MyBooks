@@ -1,4 +1,3 @@
-import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 
@@ -29,16 +28,17 @@ public class AddBookController {
 	@FXML
 	private JFXButton addButton2;
 
-	public void initialize() {
+	@FXML
+	private void initialize() {
 		contr = MyBooks.getMyContr();
 	}
-	
+
 	@FXML
-	void getLink(MouseEvent event) {
+	private void getLink(MouseEvent event) {
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Select Book");
-		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"),
-				new FileChooser.ExtensionFilter("PDF", "*.PDF"), new FileChooser.ExtensionFilter("TXT", "*.txt"));
+		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Books", " *.pdf", " *.fb2", " *.doc",
+				" *.docx", " *.txt", " *.epub", " *.mobi"));
 		Node node = (Node) event.getSource();
 		File file = chooser.showOpenDialog(node.getScene().getWindow());
 		if (file != null) {
@@ -50,11 +50,10 @@ public class AddBookController {
 	}
 
 	@FXML
-	void getImage(MouseEvent event) throws IOException {
+	private void getImage(MouseEvent event) throws IOException {
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Select Image");
-		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"),
-				new FileChooser.ExtensionFilter("JPG", "*.jpg"), new FileChooser.ExtensionFilter("PNG", "*.png"));
+		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Images", " *.jpg", " *.png"));
 		Node node = (Node) event.getSource();
 		File file = chooser.showOpenDialog(node.getScene().getWindow());
 		if (file != null) {
@@ -66,20 +65,20 @@ public class AddBookController {
 	}
 
 	@FXML
-	void addBook(MouseEvent event) {
+	private void addBook(MouseEvent event) {
 		title = titleField.getText();
 		if (title != null && !"".equals(title) && link != null) {
-			image = (image == null) ? "" : image;
-			
+			image = (image == null) ? "file:/" : image;
+
 			imageButton.setDisable(true);
 			titleField.setEditable(false);
 			titleField.setFocusTraversable(false);
 			JFXButton b = (JFXButton) event.getSource();
 			b.setDisable(true);
-			
+
 			BookDao dao = new BookDao();
-			State state = contr.getState();
-			
+			State state = contr.getCurrentState();
+
 			switch (state) {
 			case READING:
 				dao.addBook(new Book(title, link, image, 0, "..."), "reading");
@@ -91,11 +90,11 @@ public class AddBookController {
 				dao.addBook(new Book(title, link, image, 0, "..."), "read");
 				break;
 			}
-			
+
 			contr.refresh(state);
-			
+
 			Stage stage = (Stage) addButton2.getScene().getWindow();
-			stage.close();			
+			stage.close();
 		} else {
 			titleField.requestFocus();
 		}

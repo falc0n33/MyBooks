@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +76,7 @@ public class MyBooksController {
 	private ObservableList<Book> laterList = FXCollections.observableArrayList();
 	private ObservableList<Book> readList = FXCollections.observableArrayList();
 	private BookDao dao;
-	private static State state = State.READING;
+	private static State currentState = State.READING;
 
 	@FXML
 	private JFXButton readingButton;
@@ -123,12 +122,13 @@ public class MyBooksController {
 	@FXML
 	private JFXButton saveButton;
 
-	public void initialize() {
+	@FXML
+	private void initialize() {
 		dao = new BookDao();
 		readingList = dao.getAllBooks("reading");
 		laterList = dao.getAllBooks("later");
 		readList = dao.getAllBooks("read");
-		state = State.READING;
+		currentState = State.READING;
 		booksView.setItems(readingList);
 		booksView.setExpanded(true);
 
@@ -159,10 +159,10 @@ public class MyBooksController {
 		});
 	}
 
-	void searchBook(String s) {
+	private void searchBook(String s) {
 		ObservableList<Book> searchList = FXCollections.observableArrayList();
 		ObservableList<Book> oldList = FXCollections.observableArrayList();
-		switch (state) {
+		switch (currentState) {
 		case READING:
 			oldList = readingList;
 			break;
@@ -262,19 +262,32 @@ public class MyBooksController {
 		}
 	}
 
+	private ObservableList<Book> getListByState(State state) {
+		switch (state) {
+		case READING:
+			return readingList;
+		case LATER:
+			return laterList;
+		case READ:
+			return readList;
+		default:
+			return readingList;
+		}
+	}
+
 	@FXML
 	private void readingClick(MouseEvent event) {
 		if (booksView.getItems() != readingList) {
 			if (isMoving && currentBook != null) {
 				hideMoving();
-				if (dao.move(currentBook, state.toString().toLowerCase(), "reading")) {
-					// readingList.add(currentBook);
-					refresh(state);
-					refresh(State.READING);
-				}
+				if (!dao.move(currentBook, currentState.toString().toLowerCase(), "reading"))
+					dao.delete(currentBook, currentState.toString().toLowerCase());
+				ObservableList<Book> current = getListByState(currentState);
+				current.remove(currentBook);
+				refresh(State.READING);
 			}
 			booksView.setItems(readingList);
-			state = State.READING;
+			currentState = State.READING;
 			searchField.clear();
 			hideBook();
 		}
@@ -285,14 +298,14 @@ public class MyBooksController {
 		if (booksView.getItems() != laterList) {
 			if (isMoving && currentBook != null) {
 				hideMoving();
-				if (dao.move(currentBook, state.toString().toLowerCase(), "later")) {
-					// laterList.add(currentBook);
-					refresh(state);
-					refresh(State.LATER);
-				}
+				if (!dao.move(currentBook, currentState.toString().toLowerCase(), "later"))
+					dao.delete(currentBook, currentState.toString().toLowerCase());
+				ObservableList<Book> current = getListByState(currentState);
+				current.remove(currentBook);
+				refresh(State.LATER);
 			}
 			booksView.setItems(laterList);
-			state = State.LATER;
+			currentState = State.LATER;
 			searchField.clear();
 			hideBook();
 		}
@@ -303,21 +316,21 @@ public class MyBooksController {
 		if (booksView.getItems() != readList) {
 			if (isMoving && currentBook != null) {
 				hideMoving();
-				if (dao.move(currentBook, state.toString().toLowerCase(), "read")) {
-					// readList.add(currentBook);
-					refresh(state);
-					refresh(State.READ);
-				}
+				if (!dao.move(currentBook, currentState.toString().toLowerCase(), "read"))
+					dao.delete(currentBook, currentState.toString().toLowerCase());
+				ObservableList<Book> current = getListByState(currentState);
+				current.remove(currentBook);
+				refresh(State.READ);
 			}
 			booksView.setItems(readList);
-			state = State.READ;
+			currentState = State.READ;
 			searchField.clear();
 			hideBook();
 		}
 	}
 
-	public State getState() {
-		return state;
+	public State getCurrentState() {
+		return currentState;
 	}
 
 	@FXML
@@ -326,6 +339,7 @@ public class MyBooksController {
 		Stage stage = new Stage();
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add("style.css");
+		stage.getIcons().add(new Image("images/book.png"));
 		stage.setTitle("Add Book");
 		stage.setScene(scene);
 		stage.setWidth(356);
@@ -335,7 +349,7 @@ public class MyBooksController {
 	}
 
 	@FXML
-	void starClicked(MouseEvent event) {
+	private void starClicked(MouseEvent event) {
 		int val = Integer.parseInt(star.getText());
 		if (val == 5) {
 			star.setText("0");
@@ -345,28 +359,28 @@ public class MyBooksController {
 	}
 
 	@FXML
-	void deleteClicked(MouseEvent event) {
+	private void deleteClicked(MouseEvent event) {
 		deleteBook(currentBook);
 		hideBook();
-		refresh(state);
+		refresh(currentState);
 	}
 
 	@FXML
-	void mouseOver(MouseEvent event) {
+	private void mouseOver(MouseEvent event) {
 		imageView.setOpacity(0.3);
 		openButton.setVisible(true);
 		star.setVisible(true);
 	}
 
 	@FXML
-	void mouseOut(MouseEvent event) {
+	private void mouseOut(MouseEvent event) {
 		imageView.setOpacity(1);
 		openButton.setVisible(false);
 		star.setVisible(false);
 	}
 
 	@FXML
-	void openInOS(MouseEvent event) {
+	private void openInOS(MouseEvent event) {
 		try {
 			if (currentBook.getLink().length() > 6) {
 				File file = new File(currentBook.getLink().substring(6));
@@ -378,7 +392,7 @@ public class MyBooksController {
 		}
 	}
 
-	public void showBook(Book book) {
+	private void showBook(Book book) {
 		MyBooksLabel.setVisible(false);
 		imageView.setVisible(true);
 		deleteIcon.setVisible(true);
@@ -389,14 +403,15 @@ public class MyBooksController {
 		titleLabel.setText(book.getTitle());
 		star.setText(Integer.toString(book.getRate()));
 		saveButton.setVisible(true);
-		try {
+		Image image = new Image(book.getImage());
+		if (image.getHeight() != 0) {
 			imageView.setImage(new Image(book.getImage()));
-		} catch (IllegalArgumentException e) {
+		} else {
 			imageView.setImage(new Image("images/default.jpg"));
 		}
 	}
 
-	public void hideBook() {
+	private void hideBook() {
 		MyBooksLabel.setVisible(true);
 		imageView.setVisible(false);
 		deleteIcon.setVisible(false);
@@ -406,37 +421,37 @@ public class MyBooksController {
 		saveButton.setVisible(false);
 	}
 
-	public void deleteBook(Book book) {
+	private void deleteBook(Book book) {
 		if (book != null) {
-			dao.delete(book, state.toString().toLowerCase());
+			dao.delete(book, currentState.toString().toLowerCase());
 		}
 	}
 
 	@FXML
-	void deleteOut(MouseEvent event) {
+	private void deleteOut(MouseEvent event) {
 		deleteIcon.setStyle("-fx-fill: #bdc3c7");
 	}
 
 	@FXML
-	void deleteOver(MouseEvent event) {
+	private void deleteOver(MouseEvent event) {
 		deleteIcon.setStyle("-fx-fill: #e74c3c");
 	}
 
 	@FXML
-	void updateBook(MouseEvent event) {
+	private void updateBook(MouseEvent event) {
 		if (currentBook != null) {
 			String actualComment = commentArea.getText();
 			int actualRate = Integer.parseInt(star.getText());
 			if (!actualComment.equals(currentBook.getComment()) || actualRate != currentBook.getRate()) {
 				currentBook.setComment(actualComment);
 				currentBook.setRate(actualRate);
-				dao.update(currentBook, state.toString().toLowerCase());
+				dao.update(currentBook, currentState.toString().toLowerCase());
 			}
 		}
 	}
 
 	@FXML
-	void moveBook(MouseEvent event) {
+	private void moveBook(MouseEvent event) {
 		if (!isPressed)
 			showMoving();
 		else
@@ -446,17 +461,17 @@ public class MyBooksController {
 	private void showMoving() {
 		isMoving = true;
 		isPressed = true;
-		if (state == State.READING) {
+		if (currentState == State.READING) {
 			laterButton.getStyleClass().removeAll("buttonMovingDisable");
 			laterButton.getStyleClass().add("buttonMovingEnable");
 			readButton.getStyleClass().removeAll("buttonMovingDisable");
 			readButton.getStyleClass().add("buttonMovingEnable");
-		} else if (state == State.LATER) {
+		} else if (currentState == State.LATER) {
 			readingButton.getStyleClass().removeAll("buttonMovingDisable");
 			readingButton.getStyleClass().add("buttonMovingEnable");
 			readButton.getStyleClass().removeAll("buttonMovingDisable");
 			readButton.getStyleClass().add("buttonMovingEnable");
-		} else if (state == State.READ) {
+		} else if (currentState == State.READ) {
 			readingButton.getStyleClass().removeAll("buttonMovingDisable");
 			readingButton.getStyleClass().add("buttonMovingEnable");
 			laterButton.getStyleClass().removeAll("buttonMovingDisable");
@@ -477,12 +492,12 @@ public class MyBooksController {
 	}
 
 	@FXML
-	void moveOut(MouseEvent event) {
+	private void moveOut(MouseEvent event) {
 		moveIcon.setStyle("-fx-fill: #bdc3c7");
 	}
 
 	@FXML
-	void moveOver(MouseEvent event) {
+	private void moveOver(MouseEvent event) {
 		moveIcon.setStyle("-fx-fill: #2196F3");
 	}
 
